@@ -10,16 +10,17 @@ RADAR_END :: RADAR_POS + RADAR_WIDTH
 RADAR_HEIGHT :: 100
 RADAR_WXSCALE :: f32(RADAR_WIDTH) / f32(WORLD_WIDTH)
 RADAR_WYSCALE :: f32(RADAR_HEIGHT) / f32(HEIGHT)
+RADAR_LINE_THICKNESS :: 3 // thicker than a plain 1px line so it still reads clearly under the postfx shader
 
 draw_radar :: proc(g: ^Game, cam: ^Camera) {
-	rl.DrawLine(RADAR_POS, 0, RADAR_POS, RADAR_HEIGHT, COLOUR_RED)
-	rl.DrawLine(RADAR_END, 0, RADAR_END, RADAR_HEIGHT, COLOUR_RED)
-	rl.DrawLine(0, RADAR_HEIGHT, WIDTH, RADAR_HEIGHT, COLOUR_RED)
+	rl.DrawLineEx({RADAR_POS, 0}, {RADAR_POS, RADAR_HEIGHT}, RADAR_LINE_THICKNESS, COLOUR_RED)
+	rl.DrawLineEx({RADAR_END, 0}, {RADAR_END, RADAR_HEIGHT}, RADAR_LINE_THICKNESS, COLOUR_RED)
+	rl.DrawLineEx({0, RADAR_HEIGHT}, {WIDTH, RADAR_HEIGHT}, RADAR_LINE_THICKNESS, COLOUR_RED)
 	half_width := f32(WIDTH) / 2 // runtime value: the constant expression below isn't an exact integer
-	cross1 := i32(half_width - f32(RADAR_WIDTH)*RADAR_WXSCALE)
-	cross2 := i32(half_width + f32(RADAR_WIDTH)*RADAR_WXSCALE)
-	rl.DrawLine(cross1, 0, cross1, RADAR_HEIGHT, COLOUR_WHITE)
-	rl.DrawLine(cross2, 0, cross2, RADAR_HEIGHT, COLOUR_WHITE)
+	cross1 := half_width - f32(RADAR_WIDTH)*RADAR_WXSCALE
+	cross2 := half_width + f32(RADAR_WIDTH)*RADAR_WXSCALE
+	rl.DrawLineEx({cross1, 0}, {cross1, RADAR_HEIGHT}, RADAR_LINE_THICKNESS, COLOUR_WHITE)
+	rl.DrawLineEx({cross2, 0}, {cross2, RADAR_HEIGHT}, RADAR_LINE_THICKNESS, COLOUR_WHITE)
 
 	// terrain silhouette
 	ww2 := f32(WORLD_WIDTH) / 2

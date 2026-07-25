@@ -177,13 +177,22 @@ lander_state_abduct :: proc(e: ^Entity, g: ^Game) {
 	// the human tracks us itself now (its `grabbed` state), so just ascend
 	e.pos.y += e.dp.y
 	if e.pos.y < 150 {
-		lander_enter_mutated(e, g)
+		if e.human_idx != -1 && g.entities[e.human_idx].active && g.entities[e.human_idx].human_state != .Dying {
+			lander_enter_mutated(e, g)
+		} else {
+			// the carried human died en route (e.g. shot down while
+			// grabbed) -- nothing left to mutate for, so the lander
+			// simply vanishes instead of reaching the top and turning
+			// into a mutant
+			e.active = false
+		}
+		return
 	}
 	lander_maybe_fire_bullet(g, e)
 }
 
-// May be called with no human ever grabbed (e.g. forced by
-// trigger_world_explode() in a later phase), hence the human_idx check.
+// May be called with no human ever grabbed (forced by
+// trigger_world_explode()), hence the human_idx check.
 lander_enter_mutated :: proc(e: ^Entity, g: ^Game) {
 	if e.human_idx != -1 {
 		human_eat(g, e.human_idx) // the carried human is eaten

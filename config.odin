@@ -79,7 +79,7 @@ GAME_OVER_PAUSE :: 180
 TALLY_BONUS_PER_LEVEL :: 100
 TALLY_BONUS_MAX_LEVEL :: 5
 TALLY_TICK_FRAMES :: 4 // frames between each human reveal (~0.07s)
-TALLY_ICON_SCALE :: 2.0
+TALLY_ICON_SCALE :: 1.0
 TALLY_COLS :: 20 // humans per row before wrapping
 TALLY_COL_GAP :: 40
 TALLY_ROW_GAP :: 40
@@ -113,9 +113,10 @@ LIVES_ROW_X :: 10
 LIVES_ROW_Y :: 50
 
 BOMB_ICON_SCALE :: 0.5
-BOMB_ICON_GAP :: 20
+BOMB_ICON_GAP :: 15
 BOMB_ICON_MAX :: 7
 BOMB_COLUMN_GAP :: 8
+BOMB_COLUMN_Y :: 15 // a few pixels down from the very top of the screen
 
 FONT_PITCH :: 30
 FONT_INK_W :: 20

@@ -25,6 +25,7 @@ Game :: struct {
 	score:      Score,
 	font:       Font,
 	controller: Game_Controller,
+	postfx:     PostFX,
 }
 
 // Game is ~1MB (dominated by the particle pool), so it's heap-allocated
@@ -47,6 +48,7 @@ init_game :: proc() -> ^Game {
 	g.score = init_score(10, 10) // left of the radar strip
 	g.font = make_font(g.assets.font)
 	g.controller = init_game_controller(&g.assets)
+	g.postfx = init_postfx()
 
 	return g
 }
@@ -54,11 +56,13 @@ init_game :: proc() -> ^Game {
 destroy_game :: proc(g: ^Game) {
 	unload_assets(&g.assets)
 	rl.UnloadRenderTexture(g.play_area)
+	destroy_postfx(&g.postfx)
 	free(g)
 }
 
 update_frame :: proc(g: ^Game) {
 	poll_input(&g.input)
+	update_postfx(&g.postfx)
 
 	// Fresh event queue for this frame -- gameplay_active() below still
 	// reflects last frame's tick_game_controller() call at the bottom of
@@ -131,7 +135,14 @@ draw_frame :: proc(g: ^Game) {
 
 	source := rl.Rectangle{0, 0, f32(g.play_area.texture.width), -f32(g.play_area.texture.height)}
 	dest := rl.Rectangle{offset_x, offset_y, f32(WIDTH), f32(HEIGHT)}
+
+	if g.postfx.enabled {
+		rl.BeginShaderMode(g.postfx.shader)
+	}
 	rl.DrawTexturePro(g.play_area.texture, source, dest, {0, 0}, 0, COLOUR_WHITE)
+	if g.postfx.enabled {
+		rl.EndShaderMode()
+	}
 
 	rl.EndDrawing()
 }

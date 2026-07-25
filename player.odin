@@ -247,6 +247,7 @@ enter_die :: proc(p: ^Player, g: ^Game) {
 	p.lean = 0
 	freeze_enemies(g)
 	clear_lasers(g)
+	clear_bonuses(g)
 	deactivate_dying_entities(g)
 	push_event(&g.events, {kind = .Player_Die, pos = p.pos, entity_idx = -1})
 }

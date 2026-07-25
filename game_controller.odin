@@ -343,7 +343,7 @@ draw_bombs :: proc(g: ^Game) {
 	}
 	icon_width := g.controller.bomb_icon.frame_width * BOMB_ICON_SCALE
 	x := f32(RADAR_POS) - icon_width - BOMB_COLUMN_GAP
-	y := f32(0)
+	y := f32(BOMB_COLUMN_Y)
 	for _ in 0 ..< n {
 		sprite_draw_scaled(&g.controller.bomb_icon, x, y, COLOUR_WHITE, false, BOMB_ICON_SCALE)
 		y += BOMB_ICON_GAP

@@ -93,6 +93,12 @@ update_bonuses :: proc(g: ^Game) {
 	}
 }
 
+clear_bonuses :: proc(g: ^Game) {
+	for i in 0 ..< MAX_BONUSES {
+		g.bonuses[i].active = false
+	}
+}
+
 draw_bonuses :: proc(g: ^Game, cam: ^Camera) {
 	for i in 0 ..< MAX_BONUSES {
 		b := &g.bonuses[i]

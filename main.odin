@@ -7,6 +7,7 @@ main :: proc() {
 	rl.InitWindow(WIDTH, HEIGHT, "Defender")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(TARGET_FPS)
+	rl.HideCursor() // no mouse input in this game; keep the pointer off screen
 
 	when FULLSCREEN {
 		monitor := rl.GetCurrentMonitor()
