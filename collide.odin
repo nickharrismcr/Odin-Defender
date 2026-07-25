@@ -4,8 +4,7 @@ import rl "vendor:raylib"
 
 // Axis-aligned box collision, world-wraparound aware. Boxes are world-space
 // [x1,y1,x2,y2]. Sprites are top-left anchored (drawn at pos), so an
-// entity's box is [pos.x, pos.y, pos.x+w, pos.y+h]. Ported from
-// world/collide.lox.
+// entity's box is [pos.x, pos.y, pos.x+w, pos.y+h].
 Box :: struct {
 	x1, y1, x2, y2: f32,
 }

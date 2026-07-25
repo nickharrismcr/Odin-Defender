@@ -3,7 +3,7 @@ package main
 import rl "vendor:raylib"
 
 // Baiter: lurks unseen, then materialises next to the player and hunts it
-// down. Ported from npc/baiter.lox.
+// down.
 make_baiter :: proc(a: ^Assets, pos: rl.Vector2, wait_frames: int) -> Entity {
 	e: Entity
 	e.active = true

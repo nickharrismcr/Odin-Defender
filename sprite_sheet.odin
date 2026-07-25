@@ -2,9 +2,8 @@ package main
 
 import rl "vendor:raylib"
 
-// Replaces glox's native `Texture` object (a horizontal filmstrip sprite
-// sheet with an animatable playback window). Draw calls advance the current
-// frame as a side effect, matching the original.
+// A horizontal filmstrip sprite sheet with an animatable playback window.
+// Draw calls advance the current frame as a side effect.
 Sprite_Sheet :: struct {
 	texture:         rl.Texture2D,
 	frame_width:     f32,
@@ -30,10 +29,7 @@ sprite_set_animate :: proc(s: ^Sprite_Sheet, ticks_per_frame: i32) {
 	s.ticks_per_frame = ticks_per_frame
 }
 
-// Advances the current frame, wrapped within [start_frame,end_frame]. The
-// original wraps by the sheet's *total* frame count instead of the playback
-// window -- a latent bug when start/end don't span the whole sheet. Fixed
-// here deliberately (see the porting plan).
+// Advances the current frame, wrapped within [start_frame,end_frame].
 sprite_advance :: proc(s: ^Sprite_Sheet) {
 	if s.ticks_per_frame == 0 {
 		return
@@ -91,16 +87,10 @@ sprite_draw_rect :: proc(s: ^Sprite_Sheet, x, y, src_x, src_y, src_w, src_h: f32
 // Draws the sheet's first frame as an 8x8 grid of tiles, each pushed
 // radially outward from the sprite's centre scaled by `disperse` (1 =
 // assembled, larger = scattered). Used for NPC/player materialise and death
-// animations. (sx, sy) is the assembled sprite's top-left on screen.
-//
-// Deliberately does not advance the sheet's animation: the original calls
-// draw_texture_rect once per tile (64x per disperse draw), which mutates the
-// sheet's internal frame/tick counters as a side effect that draw_disperse
-// itself never reads back (every tile's source rect is always within the
-// sheet's first frame, regardless of current frame) -- replicating that
-// would only corrupt animation state for the next normal draw once the
-// disperse animation ends, with no visible effect during the disperse
-// itself, so it's dropped here.
+// animations, and the intro title reveal. (sx, sy) is the assembled
+// sprite's top-left on screen. Does not advance the sheet's animation --
+// every tile's source rect is always within the sheet's first frame, so
+// there's nothing to advance.
 sprite_draw_disperse :: proc(s: ^Sprite_Sheet, sx, sy, disperse: f32, tint: rl.Color) {
 	COLS :: 8
 	ROWS :: 8

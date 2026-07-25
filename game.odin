@@ -2,8 +2,7 @@ package main
 
 import rl "vendor:raylib"
 
-// Top-level container owning every game system. Ported from the top-level
-// state wired together in main.lox.
+// Top-level container owning every game system.
 Game :: struct {
 	assets:    Assets,
 	play_area: rl.RenderTexture2D, // fixed logical-resolution offscreen buffer
@@ -64,13 +63,8 @@ update_frame :: proc(g: ^Game) {
 	// Fresh event queue for this frame -- gameplay_active() below still
 	// reflects last frame's tick_game_controller() call at the bottom of
 	// this function, so a state change (e.g. intro -> level_start) takes
-	// effect starting next frame, same as the original's call order.
+	// effect starting next frame.
 	clear_events(&g.events)
-
-	// debug_update runs after the clear (not before): several debug keys
-	// (J, K, X) push real events (kills, etc.) that need to survive to this
-	// frame's consumer polls below, same as any other producer.
-	debug_update(g)
 
 	if gameplay_active(g) {
 		player_update(&g.player, g, &g.input)
@@ -81,9 +75,7 @@ update_frame :: proc(g: ^Game) {
 		check_collisions(g)
 	}
 	// Runs unconditionally (not just during gameplay) so the score's colour
-	// cycle keeps animating through the level-finish tally screen too --
-	// deliberately deviating from the original here, since that whole
-	// tally/bonus screen doesn't exist in the original either.
+	// cycle keeps animating through the level-finish tally screen too.
 	update_score(&g.score)
 
 	// Every consumer reacts to this frame's fresh events (pushed by the
@@ -104,8 +96,8 @@ draw_frame :: proc(g: ^Game) {
 	// draw the whole game into the fixed-size play_area texture
 	rl.BeginTextureMode(g.play_area)
 	rl.ClearBackground(COLOUR_BLACK)
-	// Intro, Level_Finish, and Game_Over all hide the world itself (per the
-	// user's requests) -- stars/terrain/entities/ship disappear. The radar
+	// Intro, Level_Finish, and Game_Over all hide the world itself --
+	// stars/terrain/entities/ship disappear. The radar
 	// (its border/crosshair lines plus terrain silhouette and any surviving
 	// humans) and score stay up during Level_Finish/Game_Over, but neither
 	// shows during Intro (nothing meaningful for either to display yet).

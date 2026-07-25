@@ -4,8 +4,7 @@ import rl "vendor:raylib"
 
 // Procedural terrain: one height sample per world-x unit, generated once at
 // startup via a random walk and never reallocated (fixed-size array sized to
-// the whole world width -- see WORLD_WIDTH in config.odin). Ported from
-// world/mountains.lox.
+// the whole world width -- see WORLD_WIDTH in config.odin).
 Mountains :: struct {
 	max_height: f32,
 	points:     [WORLD_WIDTH]f32,
@@ -35,8 +34,8 @@ mountains_generate_points :: proc(m: ^Mountains) {
 		}
 	}
 
-	// Backfill the right side so the terrain reaches 0 height by both ends of
-	// the world (matches the original's exact loop structure).
+	// Backfill the right side so the terrain reaches 0 height by both ends
+	// of the world.
 	h = 0
 	dh = 1
 	i := WORLD_WIDTH - 1
@@ -54,8 +53,7 @@ mountains_explode :: proc(m: ^Mountains) {
 	m.exploding = true
 }
 
-// Hidden for the duration of the level-complete banner. Ported from
-// Mountain.attach()'s "level_finish"/"level_start" event subscriptions.
+// Hidden for the duration of the level-complete banner.
 apply_mountain_events :: proc(g: ^Game) {
 	for i in 0 ..< g.events.count {
 		#partial switch g.events.events[i].kind {

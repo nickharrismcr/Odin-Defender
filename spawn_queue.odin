@@ -2,9 +2,8 @@ package main
 
 import rl "vendor:raylib"
 
-// Fixed-capacity replacement for the original's dynamic [entity,delay] list
-// (entity_mgr.lox's this.queue). Position/params are resolved at enqueue
-// time, matching the original.
+// Pending spawns waiting out their delay before becoming a live entity.
+// Position/params are resolved at enqueue time.
 Spawn_Kind :: enum {
 	Lander,
 	Pod,
@@ -35,15 +34,11 @@ queue_spawn :: proc(g: ^Game, kind: Spawn_Kind, pos: rl.Vector2, delay: int, wai
 			return
 		}
 	}
-	// Pool exhausted: matches the original's pools, which silently drop a
-	// spawn/fire attempt when full rather than growing. See the porting
-	// plan's note on adding a loud debug assert here if this ever proves
-	// reachable in real play.
+	// Pool exhausted: the spawn is silently dropped.
 }
 
 // add_landers queues `num` landers with world-random spawn positions,
-// staggered `delay` frames apart from being called. Ported from
-// EntityMgr.add_landers().
+// staggered `delay` frames apart from being called.
 add_landers :: proc(g: ^Game, num, delay: int) {
 	for _ in 0 ..< num {
 		pos := rl.Vector2{f32(rand_int(0, WORLD_WIDTH)), f32(rand_int(100, HEIGHT / 2))}
@@ -97,8 +92,7 @@ add_humans :: proc(g: ^Game, num: int) {
 }
 
 // Ticks every pending spawn's delay down by one, promoting any that reach
-// zero into a live pool entity. Ported from EntityMgr.update()'s queue-drain
-// loop.
+// zero into a live pool entity.
 tick_spawn_queue :: proc(g: ^Game) {
 	for i in 0 ..< MAX_PENDING_SPAWNS {
 		ps := &g.spawn_queue[i]

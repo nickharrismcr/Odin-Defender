@@ -2,9 +2,9 @@ package main
 
 import rl "vendor:raylib"
 
-// Fixed-size per-frame event queue, replacing the original's closure-based
-// pub/sub EventDispatcher (game/event.lox) -- see the porting plan for why
-// (Odin procs can't capture enclosing state like glox's closures do).
+// Fixed-size per-frame event queue used to decouple systems that react to
+// gameplay happenings (kills, rescues, spawns, level transitions) from the
+// code that triggers them.
 //
 // Lifecycle, all within one update_frame call: cleared at the top, then
 // gameplay (entity updates, collisions) pushes this frame's events, then
@@ -12,12 +12,7 @@ import rl "vendor:raylib"
 // polls the same fully-populated queue, and only THEN does
 // tick_game_controller() run its state-machine dispatch -- so e.g.
 // state_level's landers-killed check reacts the instant the last lander's
-// death event lands, same frame, not a frame late. An earlier version of
-// this queue tried to preserve the original's natural cross-frame call-
-// order lag by clearing once at the very end of the frame with
-// game_controller polling at the top -- that silently dropped every event
-// (cleared before game_controller's next poll ever saw them). This
-// same-frame design is simpler and was verified against that failure.
+// death event lands, same frame, not a frame late.
 Event_Kind :: enum {
 	Lander_Spawn,
 	Human_Spawn,
@@ -67,7 +62,7 @@ Event_Queue :: struct {
 
 push_event :: proc(eq: ^Event_Queue, ev: Event) {
 	if eq.count >= MAX_EVENTS_PER_FRAME {
-		return // queue full this frame; drop (see the porting plan's pool-sizing notes)
+		return // queue full this frame; drop
 	}
 	eq.events[eq.count] = ev
 	eq.count += 1

@@ -5,15 +5,12 @@ import rl "vendor:raylib"
 // Lander/mutant: the core "Defender" enemy. State chain: materialize ->
 // descend -> search -> grab -> abduct -> mutated -> die. Every transition
 // into a state (other than the initial one, set in make_lander) goes
-// through a matching lander_enter_<state> function. Ported from
-// npc/lander.lox.
+// through a matching lander_enter_<state> function.
 //
-// Notably, the original's Lander does NOT extend the shared NPC base (it
-// re-implements its own die/draw), because its death needs to drop/release
-// any carried human -- kept as its own die implementation here too
-// (lander_enter_die/lander_state_die), distinct from the generic
-// entity_enter_die/entity_state_die shared by the simpler NPC kinds added
-// in a later phase.
+// Lander has its own die implementation (lander_enter_die/lander_state_die),
+// distinct from the generic entity_enter_die/entity_state_die shared by the
+// simpler NPC kinds, since its death needs to drop/release any carried
+// human.
 
 LANDER_RADAR_GREEN :: rl.Color{0, 200, 0, 255}
 LANDER_RADAR_RED :: rl.Color{255, 0, 0, 255}
@@ -81,8 +78,6 @@ lander_state_materialize :: proc(e: ^Entity, g: ^Game) {
 lander_enter_descend :: proc(e: ^Entity, g: ^Game) {
 	e.disperse = 1
 	e.draw_func = entity_draw_normal
-	// original: `random.choice((-5,-5))` -- both choices are identical
-	// (almost certainly meant to be (-5,5)), so this is always exactly -5.
 	e.dp = {-5, 5}
 	e.counter = 0
 	e.lander_state = .Descend
@@ -130,8 +125,7 @@ lander_state_search :: proc(e: ^Entity, g: ^Game) {
 	// wrapping around the world), so its position keeps changing; without
 	// this, failing to find anyone in radius the instant search begins
 	// would leave it searching forever, even as it wanders back into range
-	// of a human later. See the porting plan discussion on why this
-	// matters now that pick_a_human is radius-limited.
+	// of a human later.
 	if e.human_idx == -1 {
 		e.human_idx = pick_a_human(g, e.pos.x)
 	}

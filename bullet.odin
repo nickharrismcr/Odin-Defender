@@ -4,8 +4,8 @@ import rl "vendor:raylib"
 
 // A single NPC bullet/bomb (the same struct is reused for both -- a dropped
 // bomb is just a bullet with zero velocity and double lifetime). Pool
-// occupancy is implicit in ticks_to_live, matching the original exactly
-// (no separate "active" flag -- bullet_dead() IS the pool's free-slot test).
+// occupancy is implicit in ticks_to_live -- no separate "active" flag,
+// bullet_dead() IS the pool's free-slot test.
 Bullet :: struct {
 	pos, dp:       rl.Vector2,
 	ticks_to_live: int,

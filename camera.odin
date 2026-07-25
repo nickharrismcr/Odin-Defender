@@ -1,7 +1,6 @@
 package main
 
 // 1D horizontal-scrolling camera over a world that wraps at world_width.
-// Bespoke game logic (not raylib's Camera2D) -- ported from world/camera.lox.
 Camera :: struct {
 	screen_width: f32,
 	world_width:  f32,

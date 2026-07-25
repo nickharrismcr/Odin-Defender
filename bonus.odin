@@ -4,15 +4,12 @@ import rl "vendor:raylib"
 
 // Floating bonus-score popup, shown when a human is rescued: a "250"/"500"
 // flash-cycle graphic that spawns above the player and tracks it for its
-// whole life. Ported from game/bonus.lox.
+// whole life.
 //
-// Unlike the original (where every "250" popup shares ONE Texture object,
-// and likewise for "500"), each popup here gets its own independent
-// Sprite_Sheet copy. Sharing one sheet would mean N simultaneous popups of
-// the same value call sprite_advance() N times per frame on the same
-// state, desyncing/speeding up the flash-cycle with stack depth -- a minor
-// but pointless artifact, avoided the same way the disperse-draw animation
-// side effect was dropped (see sprite_sheet.odin's note).
+// Each popup gets its own independent Sprite_Sheet copy rather than
+// sharing one per value -- sharing would mean N simultaneous popups of the
+// same value call sprite_advance() N times per frame on the same state,
+// desyncing/speeding up the flash-cycle with stack depth.
 Bonus_Kind :: enum {
 	Points_250,
 	Points_500,
@@ -27,9 +24,7 @@ Bonus :: struct {
 	pos:    rl.Vector2,
 }
 
-// Scans this frame's event queue for rescue events -- replaces the
-// original's BonusDisplay.attach() subscriptions to "human_caught"/
-// "human_saved" (see event.odin).
+// Scans this frame's event queue for rescue events.
 apply_bonus_events :: proc(g: ^Game) {
 	for i in 0 ..< g.events.count {
 		#partial switch g.events.events[i].kind {
@@ -52,7 +47,7 @@ bonus_active_count :: proc(g: ^Game) -> int {
 }
 
 // Spawn a floating "250"/"500" popup. Stacks multiple simultaneous popups
-// above the ship rather than overlapping. Ported from BonusDisplay.spawn().
+// above the ship rather than overlapping.
 bonus_spawn :: proc(g: ^Game, kind: Bonus_Kind) {
 	idx := -1
 	for i in 0 ..< MAX_BONUSES {
@@ -62,7 +57,7 @@ bonus_spawn :: proc(g: ^Game, kind: Bonus_Kind) {
 		}
 	}
 	if idx < 0 {
-		return // pool exhausted; matches the original's silent-drop pattern elsewhere
+		return // pool exhausted; drop the popup
 	}
 
 	count := bonus_active_count(g) // BEFORE this slot is marked active

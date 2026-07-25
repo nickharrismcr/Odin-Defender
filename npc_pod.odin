@@ -3,7 +3,6 @@ package main
 import rl "vendor:raylib"
 
 // Pod: hangs motionless until shot, then bursts into a cluster of swarmers.
-// Ported from npc/pod.lox.
 make_pod :: proc(a: ^Assets, pos: rl.Vector2) -> Entity {
 	e: Entity
 	e.active = true

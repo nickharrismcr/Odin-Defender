@@ -3,8 +3,7 @@ package main
 import rl "vendor:raylib"
 
 // Swarmer: released when a pod is destroyed. Homes in on the player at
-// speed, re-aiming several times a second, and occasionally fires. Ported
-// from npc/swarmer.lox.
+// speed, re-aiming several times a second, and occasionally fires.
 make_swarmer :: proc(a: ^Assets, pos: rl.Vector2) -> Entity {
 	e: Entity
 	e.active = true

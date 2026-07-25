@@ -5,19 +5,17 @@ import rl "vendor:raylib"
 // The player ship. Classic Defender controls: hold thrust to accelerate in
 // the facing direction, tap reverse to flip facing and zero speed, Q/A to
 // move up/down, Enter to fire, Backspace for smart bomb, L-Shift to
-// hyperspace. Ported from player/player.lox.
+// hyperspace.
 //
-// A small state machine of swappable update functions, matching the NPC
-// idiom. States:
+// A small state machine of swappable update functions. States:
 //   safe_start : ship visible and already flyable, enemies hidden AND
 //                frozen. Entered on construction and after every respawn.
 //   play       : normal gameplay. Enemies visible and active.
 //   die        : just hit -- frozen in place, flashing red. Enemies stay
 //                visible but freeze too. Then -> explode.
-//   explode    : ship gone, particle burst plays (phase 4). Enemies hidden
-//                AND frozen. Then -> safe_start.
-//   hyperspace : not yet implemented (needs far_from_npcs() -- a later
-//                phase).
+//   explode    : ship gone, particle burst plays. Enemies hidden AND
+//                frozen. Then -> safe_start.
+//   hyperspace : not yet implemented (needs far_from_npcs()).
 Player :: struct {
 	pos:          rl.Vector2,
 	sheet:        Sprite_Sheet, // ship.png, 5-frame animation
@@ -83,9 +81,8 @@ init_player :: proc(a: ^Assets, pos: rl.Vector2) -> Player {
 	p.bottom = PLAYER_BOTTOM
 	p.visible = true
 
-	// Set directly rather than via enter_safe_start: matches the original,
-	// which does the same to avoid emitting a player_start event before the
-	// entity manager/event system is wired up at construction time.
+	// Set directly rather than via enter_safe_start, to avoid emitting a
+	// Player_Start event before the game is fully constructed.
 	p.update_func = state_safe_start
 	p.timer = SAFE_START_FRAMES
 
@@ -233,7 +230,7 @@ enter_play :: proc(p: ^Player, g: ^Game) {
 	unfreeze_enemies(g)
 }
 
-// TODO(phase 4/5): hyperspace on in_.hyperspace (needs far_from_npcs()).
+// TODO: hyperspace on in_.hyperspace (needs far_from_npcs()).
 state_play :: proc(p: ^Player, g: ^Game, in_: ^Input) {
 	player_move(p, g, in_)
 }

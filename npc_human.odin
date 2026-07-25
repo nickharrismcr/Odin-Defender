@@ -6,10 +6,10 @@ import rl "vendor:raylib"
 // dropping (carrier killed, falls under gravity) -> dying (fatal drop) or
 // walking (survived) -- OR walking -> [player scoops it up while dropping]
 // -> caught (rides below the ship) -> walking. eaten (carrier mutated) is a
-// terminal, instant loss with no animation. Ported from npc/human.lox.
+// terminal, instant loss with no animation.
 //
-// `human_state` is readable across module boundaries (the lander and
-// check_collisions both test it), matching the original's `state` string.
+// `human_state` is readable across module boundaries -- the lander and
+// check_collisions both test it directly.
 
 make_human :: proc(a: ^Assets, pos: rl.Vector2) -> Entity {
 	e: Entity
@@ -27,8 +27,7 @@ make_human :: proc(a: ^Assets, pos: rl.Vector2) -> Entity {
 	e.human_state = .Walking
 	e.carrier_kind = .None
 	e.carrier_idx = -1
-	// dp.x doubles as the original's `dx` walk-direction field (no separate
-	// velocity use for humans otherwise)
+	// dp.x doubles as the walk-direction field (no other velocity use for humans)
 	e.dp.x = -1
 	if rand_int(0, 1) == 1 {
 		e.dp.x = 1
@@ -50,7 +49,6 @@ human_hit :: proc(e: ^Entity, g: ^Game) {
 }
 
 // --- transitions, driven by the lander / entity manager -------------------
-// Fills in the stubs npc_lander.odin and entity_mgr.odin call.
 
 // a lander latched on
 human_grab :: proc(g: ^Game, human_idx: int, carrier_idx: int) {

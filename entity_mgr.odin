@@ -3,8 +3,7 @@ package main
 import rl "vendor:raylib"
 
 // Scalar/manager-level state for the entity subsystem -- fields that don't
-// belong to any single entity or pool. Ported from EntityMgr's own fields
-// in entity_mgr.lox.
+// belong to any single entity or pool.
 Entity_Mgr_State :: struct {
 	landers_alive:    int,
 	baiter_timer:     int,
@@ -65,7 +64,6 @@ explode_at :: proc(g: ^Game, x, y: f32) {
 // Removes every non-human entity, clears the spawn queue, and kills every
 // active bullet/laser -- used at the end of a level so nothing lingers on
 // screen behind the level-complete banner. Humans persist across levels.
-// Ported from EntityMgr.clear_wave().
 clear_wave :: proc(g: ^Game) {
 	for i in 0 ..< MAX_ENTITIES {
 		e := &g.entities[i]
@@ -144,10 +142,8 @@ smart_bomb_pass :: proc(g: ^Game) {
 // All humans are gone: force every actively-hunting lander to mutate
 // immediately (landers not yet actively engaged are just removed, no death
 // animation -- already-dying landers are left alone), and start the
-// mountains crumbling for the rest of the game. Note the original filters
-// to type=="lander" before the state check, which already excludes mutated
-// landers (type=="mutant") -- so its extra "f != state_mutated" check is
-// dead code, dropped here.
+// mountains crumbling for the rest of the game. Mutated landers have
+// kind==Mutant, already excluded by the kind filter below.
 trigger_world_explode :: proc(g: ^Game) {
 	mountains_explode(&g.mountains)
 	for i in 0 ..< MAX_ENTITIES {
@@ -166,7 +162,7 @@ trigger_world_explode :: proc(g: ^Game) {
 }
 
 // No-ops while the player's death sequence plays out -- everything freezes
-// in place until it respawns. Ported from EntityMgr.update().
+// in place until it respawns.
 update_entity_mgr :: proc(g: ^Game) {
 	if g.mgr.frozen {
 		return
@@ -217,7 +213,7 @@ update_entity_mgr :: proc(g: ^Game) {
 // ramming one kills it right back. Driven by per-entity flags rather than
 // kind, so every NPC (and a mutated lander) takes part without special-
 // casing. cam is used so the laser only damages NPCs that are actually on
-// screen. Ported from EntityMgr.check_collisions().
+// screen.
 check_collisions :: proc(g: ^Game) {
 	if g.mgr.frozen {
 		return

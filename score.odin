@@ -2,11 +2,10 @@ package main
 
 import rl "vendor:raylib"
 
-// Score counter, event-driven via the event queue (was a synchronous
-// pub/sub subscription in the original, see event.odin). A mutated lander
-// is still the same underlying entity, just renamed on mutation, so it
-// keeps a lander's value. human_caught/human_saved are the rescue bonuses,
-// also shown as a floating popup by bonus.odin. Ported from game/score.lox.
+// Score counter, event-driven via the event queue (see event.odin). A
+// mutated lander is still the same underlying entity, just renamed on
+// mutation, so it keeps a lander's value. human_caught/human_saved are the
+// rescue bonuses, also shown as a floating popup by bonus.odin.
 Score :: struct {
 	value: int,
 	x, y:  f32,
@@ -41,9 +40,8 @@ score_points_for :: proc(kind: Event_Kind) -> (int, bool) {
 	return 0, false
 }
 
-// Scans this frame's event queue for anything worth points. Replaces the
-// original's per-event-kind closure subscriptions (see Score.attach()) --
-// a new NPC only needs an entry in score_points_for() to start scoring.
+// Scans this frame's event queue for anything worth points -- a new NPC
+// only needs an entry in score_points_for() to start scoring.
 apply_score_events :: proc(g: ^Game) {
 	for i in 0 ..< g.events.count {
 		points, ok := score_points_for(g.events.events[i].kind)

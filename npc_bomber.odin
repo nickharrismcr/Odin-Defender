@@ -3,7 +3,7 @@ package main
 import rl "vendor:raylib"
 
 // Bomber: drifts diagonally, bouncing off the top and bottom of the play
-// area, scattering bombs as it goes. Ported from npc/bomber.lox.
+// area, scattering bombs as it goes.
 make_bomber :: proc(a: ^Assets, pos: rl.Vector2) -> Entity {
 	e: Entity
 	e.active = true

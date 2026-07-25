@@ -4,9 +4,6 @@ import rl "vendor:raylib"
 
 // Shared per-frame draw helpers used by every NPC-derived kind: a plain
 // single-frame draw, and the materialise/death "disperse" shatter draw.
-// Ported from npc.lox's draw_normal/draw_dispersed (lander.lox duplicates
-// these itself as draw_/draw_exp in the original -- reused here instead,
-// since they're functionally identical).
 entity_draw_normal :: proc(e: ^Entity, g: ^Game, cam: ^Camera) {
 	spos, ok := camera_translate(cam, e.pos.x)
 	if !ok {
@@ -28,8 +25,7 @@ entity_draw_dispersed :: proc(e: ^Entity, g: ^Game, cam: ^Camera) {
 // velocity on each axis independently to whatever distance/t requires, so
 // both axes arrive together -- a stationary player is hit dead-on, a moving
 // one is led correctly in x. time_mult scales the configured time-to-target
-// (>1 gives a slower, more lenient shot). Ported from npc.lox's
-// aim_bullet_at().
+// (>1 gives a slower, more lenient shot).
 aim_bullet_at :: proc(g: ^Game, e: ^Entity, time_mult: f32) {
 	t := rand_f32(f32(g.mgr.npc_bullet_time)/2, f32(g.mgr.npc_bullet_time)) * time_mult
 
@@ -43,7 +39,7 @@ aim_bullet_at :: proc(g: ^Game, e: ^Entity, time_mult: f32) {
 }
 
 // Per-frame velocity toward where the player will be in `lead` frames,
-// clamped to maxspeed. Ported from npc.lox's seek_player().
+// clamped to maxspeed.
 seek_player :: proc(g: ^Game, e: ^Entity, maxspeed, lead, xoff, yoff: f32) -> rl.Vector2 {
 	tx := g.player.pos.x + g.player.vx*lead + xoff
 	ty := g.player.pos.y + yoff

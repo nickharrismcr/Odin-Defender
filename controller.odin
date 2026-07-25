@@ -3,7 +3,7 @@ package main
 import rl "vendor:raylib"
 
 // The only place raw keys are read; everything else reads the resulting
-// flags. Ported from player/controller.lox.
+// flags.
 Input :: struct {
 	thrust:     bool, // held: accelerate in the facing direction
 	reverse:    bool, // edge-triggered: flip facing, zero speed

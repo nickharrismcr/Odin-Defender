@@ -4,10 +4,9 @@ import "core:fmt"
 import rl "vendor:raylib"
 
 // Bitmap text drawn from the alphanumeric atlas (assets/font.png): a single
-// row of 38 glyphs on a 30px pitch, ink 20x30, 25px pen advance. Ported
-// from game/text.lox. Sliced manually (explicit source rects), not through
-// Sprite_Sheet's frame system -- there's no "current frame"/animation
-// concept for a font atlas.
+// row of 38 glyphs on a 30px pitch, ink 20x30, 25px pen advance. Sliced
+// manually (explicit source rects), not through Sprite_Sheet's frame system
+// -- there's no "current frame"/animation concept for a font atlas.
 Font :: struct {
 	tex: rl.Texture2D,
 }
@@ -45,8 +44,7 @@ font_draw :: proc(font: ^Font, s: string, x, y: f32, col: rl.Color) {
 }
 
 // Left-pad n with zeros to width w. Uses the temp allocator (reset every
-// frame by the runtime) for the transient formatting -- the one allocation
-// exception the porting plan calls out; it never grows the heap across
+// frame) for the transient formatting, so it never grows the heap across
 // frames.
 zero_pad :: proc(n, w: int) -> string {
 	s := fmt.tprintf("%d", n)
@@ -57,7 +55,7 @@ zero_pad :: proc(n, w: int) -> string {
 }
 
 // Smoothly cycles a colour through a 4-entry palette, taking `steps` frames
-// per leg. Ported from text.lox's ColourCycle.
+// per leg.
 Colour_Cycle :: struct {
 	palette: [4]rl.Color,
 	steps:   int,

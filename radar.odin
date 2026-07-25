@@ -2,11 +2,8 @@ package main
 
 import rl "vendor:raylib"
 
-// Minimap strip along the top of the screen. Ported from game/radar.lox --
-// the formulas here are ported literally (including the somewhat opaque
-// variable reuse) rather than "cleaned up", to avoid introducing subtle
-// positioning bugs; all geometry is derived from compile-time constants,
-// where the original computed them once in a constructor.
+// Minimap strip along the top of the screen. All geometry is derived from
+// compile-time constants.
 RADAR_WIDTH :: WIDTH / 2
 RADAR_POS :: WIDTH / 2 - RADAR_WIDTH / 2
 RADAR_END :: RADAR_POS + RADAR_WIDTH

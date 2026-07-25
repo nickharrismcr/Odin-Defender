@@ -21,8 +21,7 @@ Assets :: struct {
 	pts500:    rl.Texture2D,
 	font:      rl.Texture2D,
 
-	// intro screen -- not part of the original glox port; sourced from the
-	// love2d-defender-master reference project (see game_controller.odin)
+	// intro screen (see game_controller.odin)
 	williams:     rl.Texture2D,
 	presents:     rl.Texture2D,
 	title:        rl.Texture2D,

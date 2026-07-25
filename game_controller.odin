@@ -5,18 +5,14 @@ import rl "vendor:raylib"
 
 // Drives the level/game-state machine: intro -> level_start -> level ->
 // level_finish -> level_start (loops), or -> game_over. Mirrors the
-// enter_<state>/state_<state> convention used elsewhere. Ported from
-// game/game_controller.lox.
+// enter_<state>/state_<state> convention used elsewhere.
 //
 // level_finish is the wave-complete screen: entering it clears every enemy/
 // bullet/laser (humans persist) and hides the ship, and pushes a
 // Level_Finish event that Mountains reacts to by hiding itself (see
 // apply_mountain_events in mountains.odin); draw_frame additionally hides
 // the starfield/entities/radar for the whole state, so nothing but the
-// banner and human tally show. Not part of the original glox port (its
-// level_finish just showed the "ATTACK WAVE N COMPLETED." banner) -- the
-// human bonus count-up below is ported from the arcade original's actual
-// end-of-wave behaviour instead. The banner ("ATTACK WAVE N COMPLETED.",
+// banner and human tally show. The banner ("ATTACK WAVE N COMPLETED.",
 // upper screen) shows throughout; surviving humans tally up one at a time
 // underneath it (lower screen), each awarding 100 x wave number points
 // (capped at wave 5, so 500/human). Once every human is counted, the
@@ -59,7 +55,7 @@ Game_Controller :: struct {
 	banner_cycle: Colour_Cycle,
 
 	// intro screen animation (see the Intro case in draw_game_controller
-	// and state_intro) -- not part of the original glox port, see config.odin
+	// and state_intro, and the constants in config.odin)
 	intro_timer:     int, // frames since the intro began
 	title_disperse:  f32, // shatter-in amount for the DEFENDER title, converges to 1
 	presents_cycle:  Colour_Cycle,
@@ -91,8 +87,8 @@ gameplay_active :: proc(g: ^Game) -> bool {
 	return g.controller.state == .Level_Start || g.controller.state == .Level
 }
 
-// Scans this frame's event queue for the four kinds the original subscribes
-// to via entities.events.on(...) in GameController's constructor.
+// Scans this frame's event queue for the four kinds this controller cares
+// about.
 apply_controller_events :: proc(g: ^Game) {
 	for i in 0 ..< g.events.count {
 		#partial switch g.events.events[i].kind {
@@ -272,15 +268,13 @@ draw_centered :: proc(font: ^Font, s: string, cx, y: f32, col: rl.Color) {
 	font_draw(font, s, cx-font_width(s)/2, y, col)
 }
 
-// Intro screen sequence: not part of the original glox port -- adapted
-// from love2d-defender-master's game/intro.lua (see config.odin for the
-// timing/layout constants and the reasoning behind each). Williams logo
-// flashes red/yellow from the start; "presents" colour-cycles in at
-// INTRO_PRESENTS_AT; the DEFENDER title (plus a colour-cycling highlight
-// overlay) shatters into place at INTRO_TITLE_AT, reusing the same
-// disperse-draw effect used for NPC materialise/death; instructions appear
-// at INTRO_TEXT_AT. SPACE skips straight to level_start at any point (see
-// state_intro).
+// Intro screen sequence (see config.odin for the timing/layout constants):
+// Williams logo flashes red/yellow from the start; "presents" colour-cycles
+// in at INTRO_PRESENTS_AT; the DEFENDER title (plus a colour-cycling
+// highlight overlay) shatters into place at INTRO_TITLE_AT, reusing the
+// same disperse-draw effect used for NPC materialise/death; instructions
+// appear at INTRO_TEXT_AT. SPACE skips straight to level_start at any
+// point (see state_intro).
 draw_intro :: proc(g: ^Game) {
 	gc := &g.controller
 

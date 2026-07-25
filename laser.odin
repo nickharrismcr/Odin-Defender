@@ -6,8 +6,7 @@ import rl "vendor:raylib"
 // cycles colour, and expires after a short life. Drawn as filled rectangles
 // (a bright core plus a dimmed "glow", see fade_colour's note on why that's
 // not real transparency), with small black gaps punched into the glow band,
-// randomised every 6 frames, for a crackling look. Ported from
-// player/laser.lox.
+// randomised every 6 frames, for a crackling look.
 Gap :: struct {
 	offset, width: f32,
 }
@@ -18,7 +17,7 @@ Laser :: struct {
 	dir:    f32,
 	len:    f32,
 	speed:  f32,
-	age:    int, // original's "alive" tick counter, renamed for clarity
+	age:    int,
 	colour: rl.Color,
 	gaps:   [LASER_NUM_GAPS]Gap,
 }

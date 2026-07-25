@@ -11,7 +11,7 @@ Star :: struct {
 
 // Parallax starfield living entirely in screen space (not world space) --
 // update() shifts every star by a small per-frame dx and wraps at the
-// screen edges. Ported from world/stars.lox.
+// screen edges.
 Starfield :: struct {
 	width, height: f32, // screen-space bounds stars spawn/wrap within
 	stars:         [NUM_STARS]Star,

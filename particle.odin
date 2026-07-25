@@ -5,12 +5,9 @@ import rl "vendor:raylib"
 
 // One-shot explosion bursts: particles fly outward from the blast point
 // starting white-hot, cool through red as they age, then fade out and die.
-// Ported from game/fx.lox, built on the original's generic particle_sys
-// module -- but simplified per the porting plan, since explosions are the
-// only particle effect the whole game ever uses: no generic Emitter/
-// Emitters abstraction, no per-particle init/update proc-pointer
-// indirection, just a flat pool and a burst-emit that hardcodes the
-// cooling/drag/additive-blend behaviour directly.
+// This is the only particle effect the game uses, so there's a flat pool
+// and a burst-emit that hardcodes the cooling/drag/additive-blend
+// behaviour directly, rather than a generic emitter abstraction.
 Particle :: struct {
 	active:    bool,
 	pos, dpos: rl.Vector2,
@@ -53,9 +50,7 @@ particle_release :: proc(pp: ^Particle_Pool, idx: int) {
 	pp.free_count += 1
 }
 
-// Queues a one-shot burst of `count` particles at world (x,y). Ported from
-// fx.lox's explosion()/explosion_init() combined (the original queues an
-// Emitter with a delay of 0, which is effectively immediate).
+// Queues a one-shot burst of `count` particles at world (x,y).
 emit_burst :: proc(g: ^Game, x, y: f32, count: int) {
 	for _ in 0 ..< count {
 		idx := particle_acquire(&g.particles)
@@ -75,9 +70,6 @@ emit_burst :: proc(g: ^Game, x, y: f32, count: int) {
 	}
 }
 
-// Ported from fx.lox's explosion_update(), inlined into the pool's update
-// pass (see emit_burst's doc comment for why there's no separate per-
-// particle update callback).
 update_particles :: proc(g: ^Game) {
 	for i in 0 ..< MAX_PARTICLES {
 		p := &g.particles.slots[i]
@@ -91,9 +83,6 @@ update_particles :: proc(g: ^Game) {
 		}
 		p.pos += p.dpos
 
-		// float() matters here in the original: age and life are ints, and
-		// int/int truncates to 0 -- not a concern in Odin since age/life
-		// are explicitly converted to f32 below.
 		t := f32(p.age) / f32(p.life) // 0..1 over the particle's life
 
 		// white -> red: pull green and blue down toward zero
@@ -111,9 +100,7 @@ update_particles :: proc(g: ^Game) {
 
 // Drawn as squares under additive blending -- unlike the laser's
 // fade_colour() trick, this genuinely uses alpha blending (real varying
-// alpha values combined with rl.BlendAdditive), since that's exactly what
-// the original's win.begin_blend_mode("BLEND_ADD") + a literal vec4 colour
-// does.
+// alpha values combined with rl.BlendAdditive).
 draw_particles :: proc(g: ^Game, cam: ^Camera) {
 	rl.BeginBlendMode(.ADDITIVE)
 	for i in 0 ..< MAX_PARTICLES {

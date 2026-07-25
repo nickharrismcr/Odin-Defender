@@ -39,14 +39,13 @@ Carrier_Kind :: enum {
 }
 
 // One "fat" struct covering every enemy/human kind, stored in a single
-// fixed-capacity pool (Game.entities). Mirrors the original's single flat
-// entities list far better than per-kind pools would, and makes the
-// lander-to-mutant in-place mutation trivial. State machines are preserved
-// as update_func/draw_func proc-pointer fields, matching every stateful
-// object's enter_<state>/state_<state> convention in the original (see
-// npc.lox, lander.lox, human.lox, player.lox).
+// fixed-capacity pool (Game.entities). A single flat pool (rather than
+// per-kind pools) keeps the lander-to-mutant in-place mutation trivial.
+// State machines are preserved as update_func/draw_func proc-pointer
+// fields, following a consistent enter_<state>/state_<state> convention
+// across every stateful object (lander, human, player, ...).
 Entity :: struct {
-	active:              bool, // pool occupancy; released the instant the original would set alive=false
+	active:              bool, // pool occupancy; released once the death animation finishes
 	visible:             bool,
 	kind:                Entity_Kind,
 	dying:               bool,
@@ -78,9 +77,8 @@ Entity :: struct {
 	carrier_idx:  int,         // human only: valid iff carrier_kind == .Lander
 }
 
-// acquire_entity returns the index of a free pool slot, or -1 if the pool is
-// exhausted (matches the original's pools, which just silently don't
-// fire/spawn when full -- see the porting plan's pool-sizing notes).
+// acquire_entity returns the index of a free pool slot, or -1 if the pool
+// is exhausted (spawns are silently dropped when full).
 acquire_entity :: proc(g: ^Game) -> int {
 	for i in 0 ..< MAX_ENTITIES {
 		if !g.entities[i].active {
@@ -90,15 +88,9 @@ acquire_entity :: proc(g: ^Game) -> int {
 	return -1
 }
 
-// update_entities advances every active entity's state machine, then applies
-// horizontal world wraparound. Ported from NPC.update()/Lander.update()'s
-// shared shape (counter++, dispatch, wrap).
-//
-// The original's Lander instead snaps position to exactly 0/worldwidth on
-// wrap (losing the overflow remainder), while every other kind preserves it
-// -- almost certainly an unintentional inconsistency, since at these speeds
-// the difference is a couple of pixels at most. Unified here to the
-// remainder-preserving version for every kind.
+// update_entities advances every active entity's state machine (counter++,
+// dispatch to update_func), then applies horizontal world wraparound,
+// preserving any overflow remainder.
 update_entities :: proc(g: ^Game) {
 	for i in 0 ..< MAX_ENTITIES {
 		e := &g.entities[i]
@@ -118,9 +110,9 @@ update_entities :: proc(g: ^Game) {
 	}
 }
 
-// enemies_hidden hides everything except humans (matches EntityMgr.draw()) --
-// set/cleared directly by the player's own state functions while safe-
-// starting/exploding, see player.odin.
+// g.mgr.enemies_hidden hides everything except humans -- set/cleared
+// directly by the player's own state functions while safe-starting/
+// exploding, see player.odin.
 draw_entities :: proc(g: ^Game, cam: ^Camera) {
 	for i in 0 ..< MAX_ENTITIES {
 		e := &g.entities[i]
@@ -171,10 +163,10 @@ deactivate_dying_entities :: proc(g: ^Game) {
 }
 
 // Shared death sequence for the simpler NPC kinds (pod/swarmer/baiter/
-// bomber) -- ported from npc.lox's enter_die/state_die. Lander and Human
-// have their own die logic instead (see npc_lander.odin/npc_human.odin),
-// since both need extra teardown (dropping/releasing a carried human) that
-// doesn't fit this shared version.
+// bomber). Lander and Human have their own die logic instead (see
+// npc_lander.odin/npc_human.odin), since both need extra teardown
+// (dropping/releasing a carried human) that doesn't fit this shared
+// version.
 entity_enter_die :: proc(e: ^Entity, g: ^Game) {
 	if e.dying {
 		return
@@ -211,9 +203,8 @@ entity_state_die :: proc(e: ^Entity, g: ^Game) {
 	}
 }
 
-// Death side-effect hook (only Pod overrides this, in the original, to
-// release its swarmers) -- dispatched by kind since Odin has no virtual
-// methods.
+// Death side-effect hook (only Pod does anything here, releasing its
+// swarmers) -- dispatched by kind since Odin has no virtual methods.
 entity_on_die :: proc(e: ^Entity, g: ^Game) {
 	if e.kind == .Pod {
 		add_swarmers(g, g.mgr.swarmers_per_pod, e.pos.x, e.pos.y)
@@ -221,7 +212,7 @@ entity_on_die :: proc(e: ^Entity, g: ^Game) {
 }
 
 // entity_hit dispatches a laser/smart-bomb hit to the right kind-specific
-// handler -- each kind's own hit()/enter_die() in the original.
+// handler.
 entity_hit :: proc(e: ^Entity, g: ^Game) {
 	switch e.kind {
 	case .Lander, .Mutant:
@@ -254,11 +245,7 @@ human_search_radius :: proc(level: int) -> f32 {
 }
 
 // Finds the nearest unclaimed human to from_x, within this wave's search
-// radius, claiming it, or -1 if none qualifies. The original just returned
-// the first unclaimed human in pool order (i.e. effectively arbitrary
-// relative to the lander) -- picking the nearest one within a wave-scaled
-// radius is a deliberate enhancement over that, at the user's request.
-// Ported (structurally) from EntityMgr.pick_a_human().
+// radius, claiming it, or -1 if none qualifies.
 pick_a_human :: proc(g: ^Game, from_x: f32) -> int {
 	radius := human_search_radius(g.controller.level)
 	best := -1
