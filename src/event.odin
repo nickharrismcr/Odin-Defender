@@ -22,6 +22,7 @@ Event_Kind :: enum {
 	Bomber_Spawn,
 	Lander_Searching,
 	Human_Grabbed,
+	Human_Dropped,
 	Human_Caught,
 	Human_Saved,
 	Human_Killed,

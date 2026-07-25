@@ -42,7 +42,8 @@ bomber_state_bomb :: proc(e: ^Entity, g: ^Game) {
 	if rand_int(0, 100) < 5 {
 		// dropped bombs sit where they land (zero velocity) and auto-expire
 		// via ticks_to_live, with double the usual bullet lifetime, so they
-		// linger as hazards.
+		// linger as hazards. Can happen off screen (that's fine, gameplay-wise)
+		// -- apply_sound_events() is what keeps the drop silent when it does.
 		fire_bullet(g, e.pos, {0, 0}, 200)
 	}
 }

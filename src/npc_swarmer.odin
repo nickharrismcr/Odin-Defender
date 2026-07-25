@@ -36,7 +36,9 @@ swarmer_state_chase :: proc(e: ^Entity, g: ^Game) {
 		e.dp = seek_player(g, e, e.maxspeed, 60, f32(rand_int(-500, 500)), f32(rand_int(-300, 300)))
 		e.nextthink = 12 // re-aim every 0.2s
 		if e.counter > 60 && rand_int(0, 100) == 1 {
-			aim_bullet_at(g, e, 1.0)
+			if _, on_screen := camera_translate(&g.cam, e.pos.x); on_screen {
+				aim_bullet_at(g, e, 1.0)
+			}
 		}
 	}
 	e.pos += e.dp
@@ -47,5 +49,9 @@ swarmer_state_chase :: proc(e: ^Entity, g: ^Game) {
 	}
 	if e.pos.y > f32(HEIGHT)-40 {
 		e.pos.y = f32(HEIGHT) - 40
+	}
+
+	if _, on_screen := camera_translate(&g.cam, e.pos.x); on_screen {
+		sound_play_if_not(&g.sound, .Swarmer)
 	}
 }

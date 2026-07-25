@@ -123,6 +123,7 @@ human_enter_dropping :: proc(e: ^Entity, g: ^Game) {
 	e.dp.y = 0
 	e.drop_start_y = e.pos.y
 	e.update_func = human_state_dropping
+	push_event(&g.events, {kind = .Human_Dropped, pos = e.pos, entity_idx = entity_index(g, e)})
 }
 
 human_state_dropping :: proc(e: ^Entity, g: ^Game) {

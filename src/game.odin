@@ -26,6 +26,7 @@ Game :: struct {
 	font:       Font,
 	controller: Game_Controller,
 	postfx:     PostFX,
+	sound:      Sound_Mgr,
 }
 
 // Game is ~1MB (dominated by the particle pool), so it's heap-allocated
@@ -49,6 +50,8 @@ init_game :: proc() -> ^Game {
 	g.font = make_font(g.assets.font)
 	g.controller = init_game_controller(&g.assets)
 	g.postfx = init_postfx()
+	g.sound = init_sound_mgr()
+	sound_play(&g.sound, .Start) // the intro screen is showing from startup
 
 	return g
 }
@@ -57,12 +60,14 @@ destroy_game :: proc(g: ^Game) {
 	unload_assets(&g.assets)
 	rl.UnloadRenderTexture(g.play_area)
 	destroy_postfx(&g.postfx)
+	destroy_sound_mgr(&g.sound)
 	free(g)
 }
 
 update_frame :: proc(g: ^Game) {
 	poll_input(&g.input)
 	update_postfx(&g.postfx)
+	update_music(g)
 
 	// Fresh event queue for this frame -- gameplay_active() below still
 	// reflects last frame's tick_game_controller() call at the bottom of
@@ -90,6 +95,7 @@ update_frame :: proc(g: ^Game) {
 	apply_score_events(g)
 	apply_bonus_events(g)
 	apply_mountain_events(g)
+	apply_sound_events(g)
 
 	tick_game_controller(g, &g.input)
 

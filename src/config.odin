@@ -48,6 +48,7 @@ RIGHTOFFSET :: f32(WIDTH) - f32(WIDTH) * 0.15
 OFFSETSPEED :: 10
 
 NODIE :: false // if true, the player ship cannot die (for testing)
+MUTE :: false // if true, no audio device is opened and nothing plays
 
 HYPERSPACE_DEATH_CHANCE :: 8 // 1-in-8
 HYPERSPACE_DISPERSE_START :: 50

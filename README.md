@@ -1,7 +1,7 @@
 # Defender
 
 A Defender-style side-scrolling arcade shooter, written in [Odin](https://odin-lang.org/)
-using [raylib](https://www.raylib.com/) for rendering, input, and audio-ready plumbing.
+using [raylib](https://www.raylib.com/) for rendering, input, and audio.
 
 Rescue colonists from landers before they're carried off and mutate, fend off pods,
 swarmers, baiters, and bombers, and clear each attack wave to advance.
@@ -58,8 +58,11 @@ rather than scattered condition checks.
 
 Game-wide happenings (kills, rescues, spawns, level transitions) go through a fixed-size
 per-frame event queue (`event.odin`) rather than direct calls between systems, so e.g. the
-score counter, the bonus-popup display, and the level controller can each react to the same
-event without knowing about each other.
+score counter, the bonus-popup display, the level controller, and the sound manager can each
+react to the same event without knowing about each other. Sound effects share one arcade-style
+limited channel per group (firing the laser can cut off an NPC death sound and vice versa),
+matching the original hardware's voice limits; set `MUTE` in `config.odin` to disable audio
+entirely.
 
 ### Source layout
 
@@ -84,11 +87,10 @@ form an acyclic import graph.
 | `camera.odin`, `mountains.odin`, `stars.odin`, `collide.odin` | World scrolling, terrain, starfield, collision math |
 | `sprite_sheet.odin` | Sprite-sheet animation and the shatter/disperse effect |
 | `postfx.odin` | Scanlines/CRT-distortion/chromatic-separation post-processing shader |
+| `sound.odin` | Sound effects and background/thruster music, triggered off the event queue |
 | `event.odin` | The per-frame event queue |
 | `assets.odin`, `colors.odin`, `util.odin` | Texture loading, named colours, small helpers |
 
 ## Known gaps
 
 - Hyperspace (warping to a random on-screen location) is not yet implemented.
-- TODO: sound. No audio is wired up yet (sound effects for firing, explosions,
-  rescues, etc.).

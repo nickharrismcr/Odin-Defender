@@ -249,6 +249,10 @@ lander_state_mutated :: proc(e: ^Entity, g: ^Game) {
 			aim_bullet_at(g, e, 1.0)
 		}
 	}
+
+	if _, on_screen := camera_translate(&g.cam, e.pos.x); on_screen {
+		sound_play_if_not(&g.sound, .Mutant)
+	}
 }
 
 lander_enter_die :: proc(e: ^Entity, g: ^Game) {

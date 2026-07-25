@@ -82,6 +82,8 @@ baiter_state_chase :: proc(e: ^Entity, g: ^Game) {
 	}
 
 	if rand_int(0, 150) == 1 {
-		aim_bullet_at(g, e, 1.0)
+		if _, on_screen := camera_translate(&g.cam, e.pos.x); on_screen {
+			aim_bullet_at(g, e, 1.0)
+		}
 	}
 }
