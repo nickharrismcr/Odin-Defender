@@ -11,22 +11,23 @@ swarmers, baiters, and bombers, and clear each attack wave to advance.
 Requires the Odin compiler (see [odin-lang.org](https://odin-lang.org/) for installation).
 `vendor:raylib`, used throughout, ships with the compiler.
 
-From this directory:
+The Odin source lives in `src/`; assets are loaded relative to this directory, so
+run these commands from here (not from inside `src/`):
 
 ```
-odin run . -out:defender.exe
+odin run src -out:defender.exe
 ```
 
 or to build without running:
 
 ```
-odin build . -out:defender.exe
+odin build src -out:defender.exe
 ```
 
 The recommended check flags (also worth running before committing changes):
 
 ```
-odin check . -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
+odin check src -vet -strict-style -vet-tabs -disallow-do -warnings-as-errors
 ```
 
 ## Controls
@@ -62,12 +63,12 @@ event without knowing about each other.
 
 ### Source layout
 
-All game code lives in one Odin package (`package main`), split across files by subsystem
-rather than by package, since the game's systems are tightly coupled (nearly everything
-ultimately reaches back into the top-level `Game` struct) and Odin packages must form an
-acyclic import graph.
+All game code lives in one Odin package (`package main`, under `src/`), split across files
+by subsystem rather than by package, since the game's systems are tightly coupled (nearly
+everything ultimately reaches back into the top-level `Game` struct) and Odin packages must
+form an acyclic import graph.
 
-| File | Contents |
+| File (under `src/`) | Contents |
 |---|---|
 | `main.odin` | Entry point: window setup, main loop |
 | `game.odin` | Top-level `Game` struct, per-frame update/draw orchestration |
@@ -82,6 +83,7 @@ acyclic import graph.
 | `score.odin`, `text.odin`, `radar.odin` | HUD score, bitmap font, minimap |
 | `camera.odin`, `mountains.odin`, `stars.odin`, `collide.odin` | World scrolling, terrain, starfield, collision math |
 | `sprite_sheet.odin` | Sprite-sheet animation and the shatter/disperse effect |
+| `postfx.odin` | Scanlines/CRT-distortion/chromatic-separation post-processing shader |
 | `event.odin` | The per-frame event queue |
 | `assets.odin`, `colors.odin`, `util.odin` | Texture loading, named colours, small helpers |
 
