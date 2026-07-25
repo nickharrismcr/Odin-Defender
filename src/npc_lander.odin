@@ -183,7 +183,9 @@ lander_state_abduct :: proc(e: ^Entity, g: ^Game) {
 			// the carried human died en route (e.g. shot down while
 			// grabbed) -- nothing left to mutate for, so the lander
 			// simply vanishes instead of reaching the top and turning
-			// into a mutant
+			// into a mutant. Still counts as killed for the wave tally,
+			// or a level could never end if every lander exits play this way.
+			push_event(&g.events, {kind = .Lander_Killed, pos = e.pos, entity_idx = entity_index(g, e)})
 			e.active = false
 		}
 		return

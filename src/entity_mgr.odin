@@ -155,6 +155,10 @@ trigger_world_explode :: proc(g: ^Game) {
 		if f == lander_state_search || f == lander_state_grab || f == lander_state_abduct {
 			lander_enter_mutated(e, g)
 		} else if f != lander_state_die {
+			// Not yet dying and never engaged (materialize/descend) -- still
+			// counts toward the wave's landers_killed tally, or the level
+			// could never end once every lander is gone this way.
+			push_event(&g.events, {kind = .Lander_Killed, pos = e.pos, entity_idx = entity_index(g, e)})
 			e.active = false
 		}
 	}
