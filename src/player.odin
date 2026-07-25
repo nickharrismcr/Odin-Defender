@@ -249,6 +249,8 @@ enter_die :: proc(p: ^Player, g: ^Game) {
 	clear_lasers(g)
 	clear_bonuses(g)
 	deactivate_dying_entities(g)
+	sound_stop(&g.sound, .Laser)
+	stop_thruster(&g.sound)
 	push_event(&g.events, {kind = .Player_Die, pos = p.pos, entity_idx = -1})
 }
 

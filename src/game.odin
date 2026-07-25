@@ -97,7 +97,17 @@ update_frame :: proc(g: ^Game) {
 	apply_mountain_events(g)
 	apply_sound_events(g)
 
+	before_tick := g.events.count
 	tick_game_controller(g, &g.input)
+	// tick_game_controller's own state transitions (enter_level_start/
+	// enter_level_finish) push Level_Start/Level_Finish -- but only after
+	// the consumer pass above already ran this frame, so give mountains/
+	// sound one more look at just that tail, or those two events would sit
+	// unseen until clear_events wipes them at the top of next frame.
+	if g.events.count > before_tick {
+		apply_mountain_events(g, before_tick)
+		apply_sound_events(g, before_tick)
+	}
 
 	free_all(context.temp_allocator) // reclaim this frame's zero_pad/tprintf scratch text
 }

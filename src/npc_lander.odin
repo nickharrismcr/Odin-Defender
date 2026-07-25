@@ -71,7 +71,15 @@ lander_state_materialize :: proc(e: ^Entity, g: ^Game) {
 	// converge the dispersed tiles into the assembled sprite (disperse 50 -> 1)
 	e.disperse -= 0.7
 	if e.disperse <= 1 {
-		lander_enter_descend(e, g)
+		if g.mgr.world_exploding {
+			// world already destroyed (see trigger_world_explode) -- no
+			// humans left to descend and hunt for, so skip straight to
+			// mutant instead of materialising into a search that can never
+			// find a target.
+			lander_enter_mutated(e, g)
+		} else {
+			lander_enter_descend(e, g)
+		}
 	}
 }
 
@@ -264,7 +272,19 @@ lander_enter_die :: proc(e: ^Entity, g: ^Game) {
 	e.radar_visible = false
 	e.shootable = false
 	e.deadly = false
-	// if carrying/holding a human, drop a grabbed one, otherwise free a chosen one
+	e.lander_state = .Die
+	e.update_func = lander_state_die
+
+	kill_kind := Event_Kind.Lander_Killed
+	if e.kind == .Mutant {
+		kill_kind = .Mutant_Killed
+	}
+	push_event(&g.events, {kind = kill_kind, pos = e.pos, entity_idx = entity_index(g, e)})
+
+	// Pushed after the kill event above -- Dropping shares Lander_Die's
+	// exclusive sound channel, and when both land in the same frame the
+	// later push wins the channel, so the human falling is what's actually
+	// heard rather than a redundant lander-death cue.
 	if e.human_idx != -1 {
 		h := &g.entities[e.human_idx]
 		if h.human_state == .Grabbed {
@@ -274,13 +294,6 @@ lander_enter_die :: proc(e: ^Entity, g: ^Game) {
 		}
 		e.human_idx = -1
 	}
-	e.lander_state = .Die
-	e.update_func = lander_state_die
-	kill_kind := Event_Kind.Lander_Killed
-	if e.kind == .Mutant {
-		kill_kind = .Mutant_Killed
-	}
-	push_event(&g.events, {kind = kill_kind, pos = e.pos, entity_idx = entity_index(g, e)})
 }
 
 lander_state_die :: proc(e: ^Entity, g: ^Game) {

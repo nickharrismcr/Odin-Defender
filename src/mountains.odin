@@ -53,9 +53,13 @@ mountains_explode :: proc(m: ^Mountains) {
 	m.exploding = true
 }
 
-// Hidden for the duration of the level-complete banner.
-apply_mountain_events :: proc(g: ^Game) {
-	for i in 0 ..< g.events.count {
+// Hidden for the duration of the level-complete banner. `from` lets
+// game.odin re-run this over just the tail of events tick_game_controller
+// pushes -- Level_Start/Level_Finish are only ever pushed from inside its
+// own state transitions, which run after this consumer's normal per-frame
+// pass, so those two need a second look the same frame they're pushed.
+apply_mountain_events :: proc(g: ^Game, from := 0) {
+	for i in from ..< g.events.count {
 		#partial switch g.events.events[i].kind {
 		case .Level_Finish:
 			g.mountains.hidden = true

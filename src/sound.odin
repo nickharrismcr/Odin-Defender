@@ -55,6 +55,7 @@ SOUND_GROUP := #partial [Sound_Id]int {
 	.Bomber_Die = 1,
 	.Baiter_Die = 1,
 	.Swarmer    = 1,
+	.Dropping   = 1,
 }
 
 Sound_Mgr :: struct {
@@ -109,6 +110,22 @@ sound_play :: proc(sm: ^Sound_Mgr, id: Sound_Id) {
 	}
 	rl.StopSound(sm.sounds[id])
 	rl.PlaySound(sm.sounds[id])
+}
+
+sound_stop :: proc(sm: ^Sound_Mgr, id: Sound_Id) {
+	if MUTE {
+		return
+	}
+	rl.StopSound(sm.sounds[id])
+}
+
+stop_thruster :: proc(sm: ^Sound_Mgr) {
+	if MUTE {
+		return
+	}
+	if rl.IsMusicStreamPlaying(sm.thruster) {
+		rl.StopMusicStream(sm.thruster)
+	}
 }
 
 // Only (re)starts if not already playing -- used for the continuous "buzz"
@@ -177,9 +194,13 @@ sound_for_event :: proc(kind: Event_Kind) -> (Sound_Id, bool) {
 }
 
 // Scans this frame's event queue for anything with an associated sound cue
-// -- mirrors apply_score_events' pattern in score.odin.
-apply_sound_events :: proc(g: ^Game) {
-	for i in 0 ..< g.events.count {
+// -- mirrors apply_score_events' pattern in score.odin. `from` lets
+// game.odin re-run this over just the tail of events tick_game_controller
+// pushes -- Level_Start is only ever pushed from inside its own state
+// transitions, which run after this consumer's normal per-frame pass, so
+// it needs a second look the same frame it's pushed.
+apply_sound_events :: proc(g: ^Game, from := 0) {
+	for i in from ..< g.events.count {
 		ev := &g.events.events[i]
 		// NPC bullets (e.g. a bomber's dropped bombs) can be fired off
 		// screen -- that's intentional, they linger as hazards -- but they
